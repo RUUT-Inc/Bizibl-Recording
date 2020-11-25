@@ -47,7 +47,7 @@ exports.handler = function(event, context, callback) {
                 return startRecording(event, context, callback, meetingURL, recordingId);
             } else {
                 responseBody = {
-                    message: "Missing parameter: meetingURL",
+                    message: "Missing parameter: meetingURL or recordingId",
                     input: event
                 };
                 response = {
