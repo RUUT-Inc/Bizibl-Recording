@@ -27,6 +27,7 @@ exports.handler = function(event, context, callback) {
     let meetingURL = "";
     let taskId = "";
     let recordingAction = "";
+    let recordingId = "";
     
     console.log(event);
     responseBody.input = event;
@@ -38,13 +39,15 @@ exports.handler = function(event, context, callback) {
     
     switch(recordingAction.toLowerCase()) {
         case 'start':
-            if(event.queryStringParameters && event.queryStringParameters.meetingURL) {
+            if(event.queryStringParameters && event.queryStringParameters.meetingURL && event.queryStringParameters.recordingId) {
                 console.log("Meeting URL: " + event.queryStringParameters.meetingURL);
+                console.log("recordingId: " + event.queryStringParameters.recordingId);
                 meetingURL = decodeURIComponent(event.queryStringParameters.meetingURL);
-                return startRecording(event, context, callback, meetingURL);
+                recordingId = decodeURIComponent(event.queryStringParameters.recordingId);
+                return startRecording(event, context, callback, meetingURL, recordingId);
             } else {
                 responseBody = {
-                    message: "Missing parameter: meetingURL",
+                    message: "Missing parameter: meetingURL or recordingId",
                     input: event
                 };
                 response = {
@@ -87,7 +90,7 @@ exports.handler = function(event, context, callback) {
     callback(null, response);
 };
 
-function startRecording(event, context, callback, meetingUrl) {
+function startRecording(event, context, callback, meetingUrl, recordingId) {
     let ecsRunTaskParams = {
         cluster: ecsClusterArn,
         launchType: "EC2",
@@ -96,9 +99,13 @@ function startRecording(event, context, callback, meetingUrl) {
             containerOverrides: [ 
                  { 
                     environment: [ 
-                        { 
+                        {
                             name: "MEETING_URL",
                             value: meetingUrl
+                        },
+                        {
+                            name: "RECORDING_ID",
+                            value: recordingId
                         },
                         {
                             name: "RECORDING_ARTIFACTS_BUCKET",
