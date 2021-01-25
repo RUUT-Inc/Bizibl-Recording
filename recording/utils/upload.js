@@ -21,7 +21,7 @@ class S3Uploader {
     }
 
     uploadStream(stream) {
-        const managedUpload = this.s3Uploader.upload({ Body: stream }, (err, data) => {
+        const managedUpload = this.s3Uploader.upload({ Body: stream, ContentType: 'video/mp4' }, (err, data) => {
             if (err) {
                 console.log('[stream upload process] - failure - error handling on failure', err);
             } else {
